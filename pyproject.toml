@@ -1,0 +1,26 @@
+[project]
+name = "sae"
+version = "0.1.0"
+description = "State → Action → Execute: 感知游戏画面，模型决策，自动执行"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Pillow>=10.0.0",
+    "mss>=9.0.0",
+    "numpy>=1.24.0",
+    "pynput>=1.7.6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.1.0"]
+llm = ["openai>=1.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sae"]
+
+[tool.uv]
+dev-dependencies = ["pytest>=7.0", "ruff>=0.1.0"]
