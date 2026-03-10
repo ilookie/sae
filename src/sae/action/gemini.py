@@ -14,7 +14,7 @@ from sae.state.base import State
 # 默认 LiteLLM 代理地址（OpenAI 兼容接口，不走 Google SDK）
 DEFAULT_API_BASE = "https://llm-proxy.lilithgames.com/v1"
 # 使用自定义 api_base 时默认用 openai/ 前缀，避免 LiteLLM 走 Vertex/Google 路径
-DEFAULT_MODEL_WITH_PROXY = "openai/gemini-2.0-flash"
+DEFAULT_MODEL_WITH_PROXY = "openai/gemini-3.1-flash-image-preview"
 
 # 系统提示：约束模型输出 JSON 格式的 Action
 ACTION_SYSTEM_PROMPT = """你是一个根据当前屏幕画面做决策的助手。根据用户提供的截图，输出一个要执行的动作。
