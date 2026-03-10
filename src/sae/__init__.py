@@ -7,7 +7,7 @@ SAE: State → Action → Execute
 __version__ = "0.1.0"
 
 from sae.state import State, StateProvider
-from sae.action import Action, ActionModel
+from sae.action import Action, ActionModel, GeminiActionModel
 from sae.execute import Executor
 from sae.pipeline import SAEPipeline
 
@@ -16,6 +16,7 @@ __all__ = [
     "StateProvider",
     "Action",
     "ActionModel",
+    "GeminiActionModel",
     "Executor",
     "SAEPipeline",
 ]

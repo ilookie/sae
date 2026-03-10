@@ -17,7 +17,7 @@ cd sae
 uv sync
 ```
 
-可选：带 LLM 相关依赖（后续接视觉/语言模型时用）
+可选：带 LLM 相关依赖（LiteLLM + Gemini 视觉决策）
 
 ```bash
 uv sync --extra llm
@@ -35,7 +35,7 @@ uv sync --extra dev
 sae/
   src/sae/
     state/       # 感知：State、StateProvider、ScreenStateProvider
-    action/      # 决策：Action、ActionModel、MockActionModel
+    action/      # 决策：Action、ActionModel、MockActionModel、GeminiActionModel
     execute/     # 执行：Executor、DesktopExecutor
     pipeline.py  # State → Action → Execute 主循环
   examples/
@@ -48,12 +48,25 @@ sae/
 uv run python examples/run_loop.py
 ```
 
-默认会截取主屏、用 Mock 模型随机 noop/wait 跑 5 步，不产生真实按键。可在 `run_loop.py` 里修改 `action_pool` 测试真实按键（注意窗口焦点）。
+默认会截取主屏、用 Mock 模型随机 noop/wait 跑 3 步。可在 `run_loop.py` 里修改 `action_pool` 测试真实按键（注意窗口焦点）。
+
+### 使用 Gemini 分析画面并决策
+
+安装 LLM 依赖后，可用 LiteLLM 调用 Gemini 视觉模型，根据截屏内容输出动作：
+
+```bash
+export GEMINI_API_KEY="你的 Gemini API Key"   # 或 GOOGLE_API_KEY
+uv run python examples/run_gemini_loop.py
+```
+
+**多显示器**：在屏幕一运行程序、只感知屏幕二时，使用 `ScreenStateProvider(monitor=2, ...)`。mss 索引：0=全部，1=第一块屏，2=第二块屏。
+
+需在 [Google AI Studio](https://aistudio.google.com/apikey) 申请 API Key。LiteLLM 默认请求 `https://llm-proxy.lilithgames.com/v1`（OpenAI 兼容），可通过环境变量 `LITELLM_API_BASE` 或 `GeminiActionModel(api_base="...")` 覆盖。**使用默认代理时请将模型名写成 `openai/模型名`**（如 `openai/gemini-2.0-flash`），否则会走 Google/Vertex 路径并需要安装 `google-cloud-aiplatform`。`run_gemini_loop.py` 会截屏 → 发送给代理 → 解析返回的 JSON 动作 → 执行（键盘/鼠标/等待等）。
 
 ## 扩展
 
 - **State**：实现 `StateProvider.capture()`，可接游戏内 API、模拟器帧等。
-- **Action**：实现 `ActionModel.decide(state)`，可接 VLM/LLM 或强化学习策略。
+- **Action**：实现 `ActionModel.decide(state)`；已提供 `GeminiActionModel`（LiteLLM + Gemini 视觉）。
 - **Execute**：实现 `Executor.execute(action)`，可接游戏 API、手柄等。
 
 ## 依赖
@@ -62,3 +75,4 @@ uv run python examples/run_loop.py
 - [uv](https://docs.astral.sh/uv/)：包与虚拟环境管理
 - mss, Pillow, numpy：截屏与图像
 - pynput：键盘、鼠标控制
+- [LiteLLM](https://docs.litellm.ai/)（可选）：统一调用 Gemini 等模型，用于 `GeminiActionModel`
